@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'net.rivendell'
+version '0.1.0'
+
+ext {
+    MAIN_CLASS = "bandcampscraper.BandcampScraper"
+}
+
+application {
+    mainClassName = MAIN_CLASS
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // jsoup HTML parser library @ https://jsoup.org/
+    implementation 'org.jsoup:jsoup:1.14.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+jar {
+    archiveBaseName = 'bc_scraper'
+    archiveVersion = '0.1.0'
+    manifest.attributes 'Main-Class': MAIN_CLASS
+}
+
+test {
+    useJUnitPlatform()
+}
