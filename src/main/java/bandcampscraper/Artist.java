@@ -52,6 +52,7 @@ class Artist {
         // select all li inside the grid element ol#music-grid
         Elements albumElements = doc.select("ol#music-grid li.music-grid-item");
         ArrayList<Album> albums = new ArrayList<Album>(albumElements.size());
+        // loop through albums and scrape link to the album list
         for (Element albumElement : albumElements) {
             String link = albumElement.select("a").first().attr("href");
             try {
