@@ -37,32 +37,37 @@ class Artist {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(URL))
+                .GET()
                 .build();
         HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());
+
         int statusCode = response.statusCode();
         if (statusCode != 200) {
             System.out.println("Error code " + statusCode);
             throw new Exception("Request to artist url " + URL + " failed! (" + statusCode + ")");
         }
+
         Document doc = Jsoup.parse(response.body());
+
         // First let's get the artist name and location
         Element nameLocation = doc.getElementById("band-name-location");
         String name = nameLocation.child(0).text();
         String location = nameLocation.child(1).text();
-        // select all li inside the grid element ol#music-grid
+
+        // select all li inside the grid element ol#music-grid - ALBUMS
         Elements albumElements = doc.select("ol#music-grid li.music-grid-item");
         ArrayList<Album> albums = new ArrayList<Album>(albumElements.size());
+
         // loop through albums and scrape link to the album list
         for (Element albumElement : albumElements) {
             String link = albumElement.select("a").first().attr("href");
             try {
                 albums.add(Album.scrapeFromURL(link));
             } catch (Exception e) {
-                System.out.println("Unexpected error:\n"+e);
-                throw e;
+                e.printStackTrace();
             }
         }
-        ArrayList<Album> placeholder = new ArrayList<Album>(); // delete this TODO
-        return new Artist(name, location, URL, placeholder);
+
+        return new Artist(name, location, URL, albums);
     }
 }
