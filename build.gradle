@@ -34,3 +34,7 @@ jar {
 test {
     useJUnitPlatform()
 }
+
+run {
+    standardInput = System.in
+}

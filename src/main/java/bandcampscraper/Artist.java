@@ -6,6 +6,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -21,22 +22,38 @@ import bandcampscraper.Album;
 class Artist {
     String name;
     String location;
-    String URL;
+    String artistURL;
     List<Album> albums;
 
-    public Artist(String name, String location, String URL, List<Album> albums) {
+    public Artist(String name, String location, String artistURL, List<Album> albums) {
         this.name = name;
         this.location = location;
-        this.URL = URL;
+        this.artistURL = artistURL;
         this.albums = albums;
     }
 
-    public static Artist scrapeFromURL(String URL) throws Exception {
+    public String getName() {
+        return this.name;
+    }
+
+    public String getLocation() {
+        return this.location;
+    }
+
+    public String getURL() {
+        return this.artistURL;
+    }
+
+    public List<Album> getAlbums() {
+        return this.albums;
+    }
+
+    public static Artist scrapeFromURL(String artistURL) throws IOException,InterruptedException {
         // Send the HTTP request and get contents of the artist page
         // TODO *DOES NOT WORK FOR NON GRID LAYOUT PAGES*
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(URL))
+                .uri(URI.create(artistURL))
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());
@@ -44,7 +61,7 @@ class Artist {
         int statusCode = response.statusCode();
         if (statusCode != 200) {
             System.out.println("Error code " + statusCode);
-            throw new Exception("Request to artist url " + URL + " failed! (" + statusCode + ")");
+            throw new RuntimeException("Request to artist url " + artistURL + " failed! (" + statusCode + ")");
         }
 
         Document doc = Jsoup.parse(response.body());
@@ -60,14 +77,15 @@ class Artist {
 
         // loop through albums and scrape link to the album list
         for (Element albumElement : albumElements) {
-            String link = albumElement.select("a").first().attr("href");
+            String relPath = albumElement.select("a").first().attr("href"); // gives us relative path of album
+            String absURL = (new URL(new URL(artistURL), relPath)).toString(); // concatenate it to the given URL
             try {
-                albums.add(Album.scrapeFromURL(link));
+                albums.add(Album.scrapeFromURL(absURL));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        return new Artist(name, location, URL, albums);
+        return new Artist(name, location, artistURL, albums);
     }
 }
