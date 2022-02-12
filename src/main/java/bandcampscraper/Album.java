@@ -75,7 +75,6 @@ public class Album {
 
         // price
         Element buyH4 = doc.select("li.buyItem div.ft h4.ft").first();
-        System.out.println("buyH4.text() == <<"+buyH4.text()+">>"); // debug
 
         String priceType;
         BigDecimal priceAmount;
@@ -86,9 +85,7 @@ public class Album {
         } else {
             // the 2nd child element will be a span containing price info
             Element span = buyH4.child(1);
-            System.out.println("span text: <<" + span.text() + ">> - check to nyp");
             if (span.text().equals("name your price")) {
-                System.out.println("NYP yes");
                 priceType = "Name Your Price";
                 priceAmount = new BigDecimal(0);
             } else {
@@ -107,8 +104,6 @@ public class Album {
             }
         }
 
-        System.out.println("priceType = <<"+priceType+">>");
-        System.out.println("priceAmount = <<"+priceAmount+">>");
         return new Album(title, URL, artistName, priceAmount, priceType);
     }
 }

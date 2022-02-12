@@ -50,10 +50,10 @@ class Artist {
 
     public static Artist scrapeFromURL(String artistURL) throws IOException,InterruptedException {
         // Send the HTTP request and get contents of the artist page
-        // TODO *DOES NOT WORK FOR NON GRID LAYOUT PAGES*
+        String albumsURL = (new URL(new URL(artistURL), "/music")).toString();
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(artistURL))
+                .uri(URI.create(albumsURL))
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());
@@ -61,7 +61,7 @@ class Artist {
         int statusCode = response.statusCode();
         if (statusCode != 200) {
             System.out.println("Error code " + statusCode);
-            throw new RuntimeException("Request to artist url " + artistURL + " failed! (" + statusCode + ")");
+            throw new RuntimeException("Request to artist albums url " + albumsURL + " failed! (" + statusCode + ")");
         }
 
         Document doc = Jsoup.parse(response.body());
